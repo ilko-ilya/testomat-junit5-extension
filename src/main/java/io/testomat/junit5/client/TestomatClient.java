@@ -67,7 +67,7 @@ public class TestomatClient {
 
         try {
             String body = objectMapper.writeValueAsString(request);
-            String url = BASE_URL + "/" + uid + "/testrun";
+            String url = BASE_URL + "/" + uid + "/testrun?api_key=" + apiKey;
 
             HttpRequest httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -75,7 +75,10 @@ public class TestomatClient {
                     .POST(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
-            httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            // ДОДАНО: Логування для перевірки
+            System.out.println(">>> DEBUG (Submit Test): Status " + response.statusCode());
         } catch (Exception e) {
             System.err.println("Failed to submit test result: " + e.getMessage());
         }
@@ -88,13 +91,18 @@ public class TestomatClient {
         if (uid == null || apiKey == null) return;
 
         try {
+            String body = "{\"status_event\": \"finish\"}";
+            String url = BASE_URL + "/" + uid + "?api_key=" + apiKey;
+
             HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/" + uid))
+                    .uri(URI.create(url))
                     .header("Content-Type", "application/json")
-                    .PUT(HttpRequest.BodyPublishers.noBody())
+                    .PUT(HttpRequest.BodyPublishers.ofString(body))
                     .build();
 
-            httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            System.out.println(">>> DEBUG (Finish Run): Status " + response.statusCode());
         } catch (Exception e) {
             System.err.println("Failed to finish TestRun: " + e.getMessage());
         }

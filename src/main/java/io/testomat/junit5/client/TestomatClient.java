@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.testomat.junit5.dto.TestItemRequest;
 import io.testomat.junit5.dto.TestRunRequest;
 import io.testomat.junit5.dto.TestRunResponse;
+import io.testomat.junit5.exception.TestomatException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -54,7 +55,7 @@ public class TestomatClient {
                 return res.uid();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TestomatException("Failed to create Test Run on Testomat.io", e);
         }
         return null;
     }
@@ -80,7 +81,7 @@ public class TestomatClient {
             // ДОДАНО: Логування для перевірки
             System.out.println(">>> DEBUG (Submit Test): Status " + response.statusCode());
         } catch (Exception e) {
-            System.err.println("Failed to submit test result: " + e.getMessage());
+            throw new TestomatException("Failed to submit test result to Testomat.io", e);
         }
     }
 
@@ -104,7 +105,7 @@ public class TestomatClient {
 
             System.out.println(">>> DEBUG (Finish Run): Status " + response.statusCode());
         } catch (Exception e) {
-            System.err.println("Failed to finish TestRun: " + e.getMessage());
+            throw new TestomatException("Failed to finish Test Run on Testomat.io", e);
         }
     }
 
